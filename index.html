@@ -1,0 +1,7480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111111">
+
+<title>Dress Up My Doll</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    :root {
+        --black: #111111;
+        --dark: #1b1b1b;
+        --gray: #777;
+        --light-gray: #eeeeee;
+        --border: #dddddd;
+        --white: #ffffff;
+        --cream: #f8f5f0;
+        --accent: #8d5f67;
+        --danger: #b33a3a;
+        --success: #3d7650;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f4f4;
+        color: var(--black);
+        overflow: hidden;
+    }
+
+    button,
+    input,
+    select {
+        font: inherit;
+    }
+
+    button {
+        cursor: pointer;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .topbar {
+        height: 64px;
+        background: var(--black);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 18px;
+        gap: 15px;
+        position: relative;
+        z-index: 100;
+    }
+
+    .logo {
+        font-family: Georgia, serif;
+        font-size: 20px;
+        letter-spacing: 2px;
+        white-space: nowrap;
+    }
+
+    .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .top-btn {
+        border: 1px solid #444;
+        background: #222;
+        color: white;
+        padding: 8px 13px;
+        border-radius: 5px;
+        font-size: 13px;
+    }
+
+    .top-btn:hover {
+        background: #333;
+    }
+
+    .storage-status {
+        font-size: 11px;
+        color: #bbb;
+        white-space: nowrap;
+    }
+
+    .storage-status.saved {
+        color: #9bd2a8;
+    }
+
+    .storage-status.saving {
+        color: #e8c88a;
+    }
+
+    .storage-status.error {
+        color: #ff9999;
+    }
+
+    /* =========================
+       APP
+    ========================= */
+
+    .app {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        height: calc(100vh - 64px);
+        min-height: 0;
+    }
+
+    /* =========================
+       SIDEBAR
+    ========================= */
+
+    .sidebar {
+        background: #fff;
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        min-height: 0;
+    }
+
+    .sidebar-title {
+        padding: 18px 16px 10px;
+        font-family: Georgia, serif;
+        font-size: 17px;
+    }
+
+    .category {
+        border-bottom: 1px solid #eee;
+    }
+
+    .category-btn {
+        width: 100%;
+        border: 0;
+        background: white;
+        padding: 12px 15px;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #222;
+    }
+
+    .category-btn:hover {
+        background: #f8f8f8;
+    }
+
+    .category-items {
+        display: none;
+        padding: 8px;
+        background: #fafafa;
+    }
+
+    .category-items.open {
+        display: block;
+    }
+
+    .add-category-item {
+        width: 100%;
+        padding: 10px;
+        border: 1px dashed #ccc;
+        background: white;
+        border-radius: 4px;
+        margin-bottom: 6px;
+        font-size: 12px;
+    }
+
+    .add-category-item:hover {
+        background: #f2f2f2;
+    }
+
+    /* =========================
+       WORKSPACE
+    ========================= */
+
+    .workspace {
+        min-width: 0;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        background: #e9e9e9;
+    }
+
+    .toolbar {
+        height: 52px;
+        background: white;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        overflow-x: auto;
+        flex-shrink: 0;
+    }
+
+    .tool-btn {
+        border: 1px solid #d4d4d4;
+        background: white;
+        padding: 7px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .tool-btn:hover {
+        background: #f1f1f1;
+    }
+
+    .tool-btn.danger:hover {
+        background: #fff0f0;
+        color: var(--danger);
+    }
+
+    .tool-separator {
+        width: 1px;
+        height: 28px;
+        background: #ddd;
+        margin: 0 3px;
+    }
+
+    .zoom-control {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-left: auto;
+        white-space: nowrap;
+    }
+
+    .zoom-control input {
+        width: 90px;
+    }
+
+    /* =========================
+       STAGE
+    ========================= */
+
+    .stage-area {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        padding: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .stage-wrapper {
+        position: relative;
+        flex: 0 0 auto;
+    }
+
+    .stage {
+        position: relative;
+        width: min(65vw, 650px);
+        aspect-ratio: 4 / 5;
+        background-color: white;
+        background-image:
+            linear-gradient(45deg, #eeeeee 25%, transparent 25%),
+            linear-gradient(-45deg, #eeeeee 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, #eeeeee 75%),
+            linear-gradient(-45deg, transparent 75%, #eeeeee 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+        box-shadow: 0 8px 35px rgba(0,0,0,.12);
+        overflow: hidden;
+        transform-origin: center top;
+        user-select: none;
+        touch-action: none;
+    }
+
+    .stage.grid {
+        background-image:
+            linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,0,0,.05) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    .background-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+    }
+
+    .background-layer img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .empty-stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 30px;
+        color: #999;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .empty-stage strong {
+        display: block;
+        color: #555;
+        font-size: 18px;
+        margin-bottom: 7px;
+    }
+
+    /* =========================
+       STAGE ITEMS
+    ========================= */
+
+    .stage-item {
+        position: absolute;
+        transform-origin: center center;
+        cursor: move;
+        user-select: none;
+        touch-action: none;
+    }
+
+    .stage-item img {
+        display: block;
+        width: 100%;
+        height: auto;
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-drag: none;
+    }
+
+    .stage-item.selected {
+    outline: none;
+}
+    }
+
+    .stage-item.locked {
+        cursor: not-allowed;
+        opacity: .92;
+    }
+
+    .item-label {
+        position: absolute;
+        top: -21px;
+        left: 0;
+        background: #111;
+        color: white;
+        font-size: 9px;
+        padding: 3px 5px;
+        border-radius: 3px;
+        white-space: nowrap;
+        display: none;
+    }
+
+    .stage-item.selected .item-label {
+        display: block;
+    }
+
+    .resize-handle {
+        position: absolute;
+        width: 13px;
+        height: 13px;
+        right: -7px;
+        bottom: -7px;
+        border: 2px solid white;
+        background: #111;
+        border-radius: 50%;
+        display: none;
+        cursor: nwse-resize;
+        touch-action: none;
+    }
+
+    .rotate-handle {
+        position: absolute;
+        width: 13px;
+        height: 13px;
+        left: 50%;
+        top: -30px;
+        transform: translateX(-50%);
+        border: 2px solid white;
+        background: #8d5f67;
+        border-radius: 50%;
+        display: none;
+        cursor: grab;
+        touch-action: none;
+    }
+
+    .stage-item.selected .resize-handle,
+    .stage-item.selected .rotate-handle {
+        display: block;
+    }
+
+    /* =========================
+       TOAST
+    ========================= */
+
+    .toast-container {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .toast {
+        background: #111;
+        color: white;
+        padding: 11px 15px;
+        border-radius: 5px;
+        box-shadow: 0 8px 20px rgba(0,0,0,.2);
+        font-size: 13px;
+        max-width: 330px;
+    }
+
+    .toast.success {
+        background: var(--success);
+    }
+
+    .toast.error {
+        background: var(--danger);
+    }
+
+    /* =========================
+       MODAL
+    ========================= */
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.58);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 5000;
+        padding: 20px;
+    }
+
+    .modal-overlay.open {
+        display: flex;
+    }
+
+    .modal {
+        width: min(850px, 95vw);
+        max-height: 90vh;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 20px 70px rgba(0,0,0,.3);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        padding: 16px 18px;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-family: Georgia, serif;
+        font-size: 20px;
+    }
+
+    .close-btn {
+        border: 0;
+        background: transparent;
+        font-size: 24px;
+        color: #777;
+    }
+
+    .modal-body {
+        padding: 18px;
+        overflow-y: auto;
+    }
+
+    /* =========================
+       IMPORT
+    ========================= */
+
+    .import-drop {
+        border: 2px dashed #bbb;
+        border-radius: 8px;
+        padding: 45px 20px;
+        text-align: center;
+        background: #fafafa;
+        transition: .2s;
+    }
+
+    .import-drop.dragover {
+        background: #f2ece7;
+        border-color: var(--accent);
+    }
+
+    .import-drop strong {
+        display: block;
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    .import-drop p {
+        color: #777;
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+
+    .file-button {
+        display: inline-block;
+        background: #111;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+
+    .file-button input {
+        display: none;
+    }
+
+    .import-options {
+        margin-top: 15px;
+        padding: 12px;
+        background: #f6f6f6;
+        border-radius: 5px;
+    }
+
+    .import-options label {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 12px;
+    }
+
+    /* =========================
+       CLOSET
+    ========================= */
+
+    .closet-controls {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+    }
+
+    .closet-controls input,
+    .closet-controls select {
+        padding: 9px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .closet-controls input {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .asset-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+        gap: 12px;
+    }
+
+    .asset-card {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        overflow: hidden;
+        background: white;
+    }
+
+    .asset-preview {
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px;
+        background-color: #f6f6f6;
+        background-image:
+            linear-gradient(45deg, #e9e9e9 25%, transparent 25%),
+            linear-gradient(-45deg, #e9e9e9 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, #e9e9e9 75%),
+            linear-gradient(-45deg, transparent 75%, #e9e9e9 75%);
+        background-size: 16px 16px;
+        background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+    }
+
+    .asset-preview img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .asset-info {
+        padding: 8px;
+    }
+
+    .asset-name {
+        font-size: 12px;
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .asset-category {
+        font-size: 10px;
+        color: #888;
+        margin-top: 3px;
+    }
+
+    .asset-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+        margin-top: 8px;
+    }
+
+    .asset-actions button {
+        border: 1px solid #ddd;
+        background: white;
+        padding: 6px;
+        border-radius: 4px;
+        font-size: 10px;
+    }
+
+    .asset-actions button:hover {
+        background: #f3f3f3;
+    }
+
+    .favorite-button.active {
+        color: #a04a59;
+        font-weight: bold;
+    }
+
+    .delete-asset {
+        color: var(--danger);
+    }
+
+    /* =========================
+       SAVED OUTFITS
+    ========================= */
+
+    .saved-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+    }
+
+    .saved-card {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+
+    .saved-thumb {
+        height: 200px;
+        background: #f1f1f1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .saved-thumb img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .saved-info {
+        padding: 9px;
+    }
+
+    .saved-name {
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    .saved-date {
+        color: #888;
+        font-size: 10px;
+        margin-top: 3px;
+    }
+
+    .saved-actions {
+        display: flex;
+        gap: 5px;
+        margin-top: 8px;
+    }
+
+    .saved-actions button {
+        flex: 1;
+        padding: 6px;
+        font-size: 10px;
+        border: 1px solid #ddd;
+        background: white;
+        border-radius: 4px;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 800px) {
+
+        .topbar {
+            height: auto;
+            min-height: 58px;
+            padding: 9px 10px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 15px;
+        }
+
+        .storage-status {
+            display: none;
+        }
+
+        .app {
+            grid-template-columns: 75px 1fr;
+            height: calc(100vh - 58px);
+        }
+
+        .sidebar-title {
+            display: none;
+        }
+
+        .category-btn {
+            padding: 12px 5px;
+            justify-content: center;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .category-btn span:last-child {
+            display: none;
+        }
+
+        .category-items {
+            position: absolute;
+            left: 75px;
+            width: 190px;
+            z-index: 1000;
+            box-shadow: 5px 5px 15px rgba(0,0,0,.12);
+            border: 1px solid #ddd;
+        }
+
+        .stage-area {
+            padding: 15px;
+        }
+
+        .stage {
+            width: min(82vw, 500px);
+        }
+
+        .toolbar {
+            height: 48px;
+        }
+
+        .tool-btn {
+            padding: 6px 8px;
+            font-size: 10px;
+        }
+    }
+
+    @media (max-width: 500px) {
+
+        .top-actions .top-btn:nth-child(3) {
+            display: none;
+        }
+
+        .stage-area {
+            padding: 10px;
+        }
+
+        .stage {
+            width: 88vw;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="logo">
+        DRESS UP MY DOLL
+    </div>
+
+    <div class="top-actions">
+
+        <span id="storageStatus" class="storage-status">
+            Starting...
+        </span>
+
+        <button class="top-btn" id="addItemBtn">
+            + Add Item
+        </button>
+
+        <button class="top-btn" id="saveOutfitBtn">
+            Save Outfit
+        </button>
+
+        <button class="top-btn" id="loadOutfitBtn">
+            Load Outfit
+        </button>
+
+    </div>
+
+</header>
+
+
+<div class="app">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-title">
+            Wardrobe
+        </div>
+
+        <div id="categories"></div>
+
+    </aside>
+
+
+    <!-- =========================
+         WORKSPACE
+    ========================== -->
+
+    <main class="workspace">
+
+        <div class="toolbar">
+
+            <button class="tool-btn" id="undoBtn" title="Undo">
+                ↶ Undo
+            </button>
+
+            <button class="tool-btn" id="redoBtn" title="Redo">
+                ↷ Redo
+            </button>
+
+            <div class="tool-separator"></div>
+
+            <button class="tool-btn" id="centerBtn">
+                Center
+            </button>
+
+            <button class="tool-btn" id="duplicateBtn">
+                Duplicate
+            </button>
+
+            <button class="tool-btn" id="forwardBtn">
+                Forward
+            </button>
+
+            <button class="tool-btn" id="backBtn">
+                Back
+            </button>
+
+            <button class="tool-btn" id="rotateLeftBtn">
+                ↶
+            </button>
+
+            <button class="tool-btn" id="rotateRightBtn">
+                ↷
+            </button>
+
+            <button class="tool-btn" id="flipHBtn">
+                Flip H
+            </button>
+
+            <button class="tool-btn" id="flipVBtn">
+                Flip V
+            </button>
+
+            <button class="tool-btn" id="lockBtn">
+                Lock
+            </button>
+
+            <button class="tool-btn" id="hideBtn">
+                Hide
+            </button>
+
+            <button class="tool-btn danger" id="deleteBtn">
+                Delete
+            </button>
+
+            <div class="tool-separator"></div>
+
+            <button class="tool-btn" id="gridBtn">
+                Grid
+            </button>
+
+            <button class="tool-btn" id="fullscreenBtn">
+                Fullscreen
+            </button>
+
+            <div class="zoom-control">
+
+                <span>Zoom</span>
+
+                <input
+                    id="zoomSlider"
+                    type="range"
+                    min="70"
+                    max="140"
+                    value="100"
+                >
+
+                <span id="zoomValue">
+                    100%
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="stage-area" id="stageArea">
+
+            <div class="stage-wrapper" id="stageWrapper">
+
+                <div
+                    class="stage"
+                    id="stage"
+                >
+
+                    <div
+                        class="background-layer"
+                        id="backgroundLayer"
+                    ></div>
+
+                    <div
+                        class="empty-stage"
+                        id="emptyStage"
+                    >
+                        <div>
+                            <strong>Your doll studio</strong>
+                            Add a doll, clothing or background from your wardrobe.
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- =========================
+     IMPORT MODAL
+========================== -->
+
+<div class="modal-overlay" id="importModal">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <h2>Import Image</h2>
+
+            <button
+                class="close-btn"
+                data-close="importModal"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <div
+                class="import-drop"
+                id="importDrop"
+            >
+
+                <strong>
+                    Add a wardrobe item
+                </strong>
+
+                <p>
+                    PNG, JPG, JPEG and WebP are supported.
+                </p>
+
+                <label class="file-button">
+
+                    Choose Image
+
+                    <input
+                        id="fileInput"
+                        type="file"
+                        accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                    >
+
+                </label>
+
+                <div class="import-options">
+
+                    <label>
+
+                        <input
+                            type="checkbox"
+                            id="removeWhiteBackground"
+                        >
+
+                        Remove simple white background
+
+                    </label>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     CLOSET MODAL
+========================== -->
+
+<div class="modal-overlay" id="closetModal">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <h2>My Closet</h2>
+
+            <button
+                class="close-btn"
+                data-close="closetModal"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <div class="closet-controls">
+
+                <input
+                    id="closetSearch"
+                    type="search"
+                    placeholder="Search items..."
+                >
+
+                <select id="closetSort">
+
+                    <option value="newest">
+                        Newest
+                    </option>
+
+                    <option value="name">
+                        Name A–Z
+                    </option>
+
+                    <option value="category">
+                        Category
+                    </option>
+
+                </select>
+
+                <button
+                    class="tool-btn"
+                    id="favoriteFilterBtn"
+                >
+                    ★ Favorites
+                </button>
+
+            </div>
+
+            <div
+                class="asset-grid"
+                id="assetGrid"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     SAVED OUTFITS MODAL
+========================== -->
+
+<div class="modal-overlay" id="savedModal">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <h2>Saved Outfits</h2>
+
+            <button
+                class="close-btn"
+                data-close="savedModal"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <div
+                class="saved-list"
+                id="savedList"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     TOASTS
+========================== -->
+
+<div
+    class="toast-container"
+    id="toastContainer"
+></div>
+
+
+<script>
+/* ============================================================
+   DRESS UP MY DOLL
+   PHASE 1
+   Stability:
+   - Chrome + Edge
+   - Reliable image importing
+   - IndexedDB/localStorage/in-memory fallback
+   - Auto-save
+============================================================ */
+
+
+/* ============================================================
+   CONSTANTS
+============================================================ */
+
+const DB_NAME = "DressUpMyDollDB";
+const DB_VERSION = 2;
+const STORE_NAME = "assets";
+
+const ASSET_FALLBACK_KEY = "DressUpMyDoll_assets_v2";
+const AUTOSAVE_KEY = "DressUpMyDoll_autosave_v2";
+const SAVED_OUTFITS_KEY = "DressUpMyDoll_saved_outfits_v2";
+
+const AUTOSAVE_DELAY = 700;
+
+const MAX_IMAGE_SIZE = 1800;
+
+
+/* ============================================================
+   CATEGORIES
+============================================================ */
+
+const CATEGORIES = [
+
+    {
+        id: "background",
+        name: "Background"
+    },
+
+    {
+        id: "doll",
+        name: "Doll"
+    },
+
+    {
+        id: "hair",
+        name: "Hair"
+    },
+
+    {
+        id: "outfit",
+        name: "Outfit"
+    },
+
+    {
+        id: "top",
+        name: "Top"
+    },
+
+    {
+        id: "bottom",
+        name: "Bottom"
+    },
+
+    {
+        id: "shoes",
+        name: "Shoes"
+    },
+
+    {
+        id: "bags",
+        name: "Bags"
+    },
+
+    {
+        id: "hats",
+        name: "Hats"
+    },
+
+    {
+        id: "glasses",
+        name: "Glasses"
+    },
+
+    {
+        id: "earrings",
+        name: "Earrings"
+    },
+
+    {
+        id: "necklaces",
+        name: "Necklaces"
+    },
+
+    {
+        id: "bracelets",
+        name: "Bracelets"
+    },
+
+    {
+        id: "belts",
+        name: "Belts"
+    },
+
+    {
+        id: "coats",
+        name: "Coats"
+    },
+
+    {
+        id: "scarves",
+        name: "Scarves"
+    },
+
+    {
+        id: "capes",
+        name: "Capes"
+    },
+
+    {
+        id: "wings",
+        name: "Wings"
+    },
+
+    {
+        id: "accessories",
+        name: "Accessories"
+    },
+
+    {
+        id: "objects",
+        name: "Objects"
+    },
+
+    {
+        id: "my-closet",
+        name: "My Closet"
+    }
+
+];
+
+
+/* ============================================================
+   STATE
+============================================================ */
+
+let db = null;
+
+let storageMode = "memory";
+
+let assets = [];
+
+let gameItems = [];
+
+let selectedItemId = null;
+
+let zCounter = 10;
+
+let currentBackground = null;
+
+let history = [];
+
+let future = [];
+
+let isRestoring = false;
+
+let autosaveTimer = null;
+
+let favoriteFilter = false;
+
+let stageZoom = 1;
+
+let pointerState = null;
+
+
+/* ============================================================
+   DOM
+============================================================ */
+
+const stage = document.getElementById("stage");
+const stageWrapper = document.getElementById("stageWrapper");
+const stageArea = document.getElementById("stageArea");
+
+const backgroundLayer =
+    document.getElementById("backgroundLayer");
+
+const emptyStage =
+    document.getElementById("emptyStage");
+
+const categoriesContainer =
+    document.getElementById("categories");
+
+const storageStatus =
+    document.getElementById("storageStatus");
+
+const toastContainer =
+    document.getElementById("toastContainer");
+
+
+/* ============================================================
+   BASIC HELPERS
+============================================================ */
+
+function makeId(prefix = "id") {
+
+    return (
+        prefix +
+        "_" +
+        Date.now().toString(36) +
+        "_" +
+        Math.random().toString(36).slice(2, 9)
+    );
+
+}
+
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+function showToast(message, type = "") {
+
+    const toast = document.createElement("div");
+
+    toast.className =
+        "toast" +
+        (type ? " " + type : "");
+
+    toast.textContent = message;
+
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+
+        toast.remove();
+
+    }, 3500);
+
+}
+
+
+function updateStorageStatus(
+    text,
+    type = ""
+) {
+
+    storageStatus.textContent = text;
+
+    storageStatus.className =
+        "storage-status" +
+        (type ? " " + type : "");
+
+}
+
+
+/* ============================================================
+   SAFE LOCAL STORAGE
+============================================================ */
+
+function localStorageAvailable() {
+
+    try {
+
+        const testKey =
+            "__dress_up_test__";
+
+        window.localStorage.setItem(
+            testKey,
+            "1"
+        );
+
+        window.localStorage.removeItem(
+            testKey
+        );
+
+        return true;
+
+    } catch (error) {
+
+        return false;
+
+    }
+
+}
+
+
+function safeLocalGet(key) {
+
+    try {
+
+        return window.localStorage.getItem(key);
+
+    } catch (error) {
+
+        return null;
+
+    }
+
+}
+
+
+function safeLocalSet(key, value) {
+
+    try {
+
+        window.localStorage.setItem(
+            key,
+            value
+        );
+
+        return true;
+
+    } catch (error) {
+
+        return false;
+
+    }
+
+}
+
+
+function safeLocalRemove(key) {
+
+    try {
+
+        window.localStorage.removeItem(key);
+
+    } catch (error) {
+
+        /* ignore */
+
+    }
+
+}
+
+
+/* ============================================================
+   INDEXED DB
+============================================================ */
+
+function openDatabase() {
+
+    return new Promise((resolve, reject) => {
+
+        if (!window.indexedDB) {
+
+            reject(
+                new Error(
+                    "IndexedDB is not available."
+                )
+            );
+
+            return;
+
+        }
+
+        let request;
+
+        try {
+
+            request =
+                window.indexedDB.open(
+                    DB_NAME,
+                    DB_VERSION
+                );
+
+        } catch (error) {
+
+            reject(error);
+
+            return;
+
+        }
+
+        request.onupgradeneeded = function(event) {
+
+            const database =
+                event.target.result;
+
+            if (
+                !database.objectStoreNames.contains(
+                    STORE_NAME
+                )
+            ) {
+
+                database.createObjectStore(
+                    STORE_NAME,
+                    {
+                        keyPath: "id"
+                    }
+                );
+
+            }
+
+        };
+
+        request.onsuccess = function(event) {
+
+            const database =
+                event.target.result;
+
+            database.onversionchange = function() {
+
+                database.close();
+
+            };
+
+            resolve(database);
+
+        };
+
+        request.onerror = function() {
+
+            reject(
+                request.error ||
+                new Error(
+                    "Could not open IndexedDB."
+                )
+            );
+
+        };
+
+        request.onblocked = function() {
+
+            reject(
+                new Error(
+                    "IndexedDB was blocked."
+                )
+            );
+
+        };
+
+    });
+
+}
+
+
+/* ============================================================
+   FALLBACK ASSET STORAGE
+============================================================ */
+
+function getFallbackAssets() {
+
+    const raw =
+        safeLocalGet(
+            ASSET_FALLBACK_KEY
+        );
+
+    if (!raw) {
+
+        return [];
+
+    }
+
+    try {
+
+        const parsed =
+            JSON.parse(raw);
+
+        return Array.isArray(parsed)
+            ? parsed
+            : [];
+
+    } catch (error) {
+
+        return [];
+
+    }
+
+}
+
+
+function saveFallbackAssets(list) {
+
+    try {
+
+        const raw =
+            JSON.stringify(list);
+
+        const success =
+            safeLocalSet(
+                ASSET_FALLBACK_KEY,
+                raw
+            );
+
+        if (!success) {
+
+            throw new Error(
+                "Local storage is unavailable."
+            );
+
+        }
+
+        return true;
+
+    } catch (error) {
+
+        return false;
+
+    }
+
+}
+
+
+/* ============================================================
+   STORAGE INITIALIZATION
+============================================================ */
+
+async function initializeStorage() {
+
+    /*
+        First attempt:
+        IndexedDB
+    */
+
+    try {
+
+        db =
+            await openDatabase();
+
+        storageMode =
+            "indexedDB";
+
+        updateStorageStatus(
+            "Storage: IndexedDB",
+            "saved"
+        );
+
+        return;
+
+    } catch (error) {
+
+        console.warn(
+            "IndexedDB unavailable:",
+            error
+        );
+
+    }
+
+
+    /*
+        Second attempt:
+        localStorage
+    */
+
+    if (localStorageAvailable()) {
+
+        storageMode =
+            "localStorage";
+
+        updateStorageStatus(
+            "Storage: local",
+            "saved"
+        );
+
+        return;
+
+    }
+
+
+    /*
+        Final fallback:
+        memory only
+    */
+
+    storageMode =
+        "memory";
+
+    updateStorageStatus(
+        "Storage: temporary",
+        "error"
+    );
+
+    showToast(
+        "Browser storage is restricted. Your current session can still work, but it may not survive closing the browser.",
+        "error"
+    );
+
+}
+
+
+/* ============================================================
+   ASSET DATABASE OPERATIONS
+============================================================ */
+
+function addAssetToDB(asset) {
+
+    if (storageMode === "indexedDB") {
+
+        return new Promise((resolve, reject) => {
+
+            try {
+
+                const transaction =
+                    db.transaction(
+                        STORE_NAME,
+                        "readwrite"
+                    );
+
+                const store =
+                    transaction.objectStore(
+                        STORE_NAME
+                    );
+
+                const request =
+                    store.put(asset);
+
+                request.onsuccess =
+                    () => resolve(true);
+
+                request.onerror =
+                    () => reject(
+                        request.error
+                    );
+
+            } catch (error) {
+
+                reject(error);
+
+            }
+
+        });
+
+    }
+
+
+    if (storageMode === "localStorage") {
+
+        const existing =
+            getFallbackAssets();
+
+        const index =
+            existing.findIndex(
+                item => item.id === asset.id
+            );
+
+        if (index >= 0) {
+
+            existing[index] =
+                asset;
+
+        } else {
+
+            existing.push(asset);
+
+        }
+
+        if (!saveFallbackAssets(existing)) {
+
+            throw new Error(
+                "Could not save image to local storage."
+            );
+
+        }
+
+        return Promise.resolve(true);
+
+    }
+
+
+    /*
+        memory mode
+    */
+
+    const index =
+        assets.findIndex(
+            item => item.id === asset.id
+        );
+
+    if (index >= 0) {
+
+        assets[index] =
+            asset;
+
+    } else {
+
+        assets.push(asset);
+
+    }
+
+    return Promise.resolve(true);
+
+}
+
+
+function getAllAssetsFromDB() {
+
+    if (storageMode === "indexedDB") {
+
+        return new Promise((resolve, reject) => {
+
+            try {
+
+                const transaction =
+                    db.transaction(
+                        STORE_NAME,
+                        "readonly"
+                    );
+
+                const store =
+                    transaction.objectStore(
+                        STORE_NAME
+                    );
+
+                const request =
+                    store.getAll();
+
+                request.onsuccess =
+                    () => resolve(
+                        Array.isArray(request.result)
+                            ? request.result
+                            : []
+                    );
+
+                request.onerror =
+                    () => reject(
+                        request.error
+                    );
+
+            } catch (error) {
+
+                reject(error);
+
+            }
+
+        });
+
+    }
+
+
+    if (storageMode === "localStorage") {
+
+        return Promise.resolve(
+            getFallbackAssets()
+        );
+
+    }
+
+
+    return Promise.resolve(
+        assets
+    );
+
+}
+
+
+function deleteAssetFromDB(id) {
+
+    if (storageMode === "indexedDB") {
+
+        return new Promise((resolve, reject) => {
+
+            try {
+
+                const transaction =
+                    db.transaction(
+                        STORE_NAME,
+                        "readwrite"
+                    );
+
+                const store =
+                    transaction.objectStore(
+                        STORE_NAME
+                    );
+
+                const request =
+                    store.delete(id);
+
+                request.onsuccess =
+                    () => resolve(true);
+
+                request.onerror =
+                    () => reject(
+                        request.error
+                    );
+
+            } catch (error) {
+
+                reject(error);
+
+            }
+
+        });
+
+    }
+
+
+    if (storageMode === "localStorage") {
+
+        const existing =
+            getFallbackAssets();
+
+        const filtered =
+            existing.filter(
+                item => item.id !== id
+            );
+
+        if (!saveFallbackAssets(filtered)) {
+
+            throw new Error(
+                "Could not update local storage."
+            );
+
+        }
+
+        return Promise.resolve(true);
+
+    }
+
+
+    assets =
+        assets.filter(
+            item => item.id !== id
+        );
+
+    return Promise.resolve(true);
+
+}
+
+
+/* ============================================================
+   IMAGE DECODING
+============================================================ */
+
+function loadImageFromURL(url) {
+
+    return new Promise((resolve, reject) => {
+
+        const image =
+            new Image();
+
+        image.onload = function() {
+
+            resolve(image);
+
+        };
+
+        image.onerror = function() {
+
+            reject(
+                new Error(
+                    "The browser could not decode this image."
+                )
+            );
+
+        };
+
+        image.src = url;
+
+    });
+
+}
+
+
+async function decodeImageFile(file) {
+
+    /*
+        Try createImageBitmap first.
+        This is reliable in modern Chrome and Edge.
+    */
+
+    if (
+        typeof window.createImageBitmap ===
+        "function"
+    ) {
+
+        try {
+
+            const bitmap =
+                await window.createImageBitmap(
+                    file
+                );
+
+            return {
+                source: bitmap,
+                width: bitmap.width,
+                height: bitmap.height,
+                isBitmap: true
+            };
+
+        } catch (error) {
+
+            console.warn(
+                "createImageBitmap failed. Falling back to Image:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /*
+        Fallback:
+        object URL + Image
+    */
+
+    const objectURL =
+        URL.createObjectURL(file);
+
+    try {
+
+        const image =
+            await loadImageFromURL(
+                objectURL
+            );
+
+        return {
+            source: image,
+            width: image.naturalWidth,
+            height: image.naturalHeight,
+            isBitmap: false
+        };
+
+    } finally {
+
+        URL.revokeObjectURL(
+            objectURL
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   IMAGE NORMALIZATION
+============================================================ */
+
+function normalizeImage(
+    decoded,
+    removeWhite
+) {
+
+    let width =
+        decoded.width;
+
+    let height =
+        decoded.height;
+
+
+    /*
+        Prevent extremely large images from
+        creating enormous storage files.
+    */
+
+    const largest =
+        Math.max(
+            width,
+            height
+        );
+
+    if (
+        largest >
+        MAX_IMAGE_SIZE
+    ) {
+
+        const ratio =
+            MAX_IMAGE_SIZE /
+            largest;
+
+        width =
+            Math.round(
+                width * ratio
+            );
+
+        height =
+            Math.round(
+                height * ratio
+            );
+
+        /*
+            Do not destroy aspect ratio.
+        */
+
+    }
+
+
+    const canvas =
+        document.createElement(
+            "canvas"
+        );
+
+    canvas.width =
+        width;
+
+    canvas.height =
+        height;
+
+    const ctx =
+        canvas.getContext(
+            "2d",
+            {
+                willReadFrequently: true
+            }
+        );
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    ctx.drawImage(
+        decoded.source,
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    /*
+        Optional simple white background removal.
+
+        This is deliberately conservative.
+        It is NOT AI background removal.
+    */
+
+    if (removeWhite) {
+
+        try {
+
+            const imageData =
+                ctx.getImageData(
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+            const pixels =
+                imageData.data;
+
+            for (
+                let i = 0;
+                i < pixels.length;
+                i += 4
+            ) {
+
+                const r =
+                    pixels[i];
+
+                const g =
+                    pixels[i + 1];
+
+                const b =
+                    pixels[i + 2];
+
+                const a =
+                    pixels[i + 3];
+
+                if (
+                    a > 0 &&
+                    r > 247 &&
+                    g > 247 &&
+                    b > 247
+                ) {
+
+                    pixels[i + 3] =
+                        0;
+
+                }
+
+            }
+
+            ctx.putImageData(
+                imageData,
+                0,
+                0
+            );
+
+        } catch (error) {
+
+            console.warn(
+                "Could not remove white background:",
+                error
+            );
+
+        }
+
+    }
+
+
+    const dataURL =
+        canvas.toDataURL(
+            "image/png"
+        );
+
+
+    /*
+        Find transparent bounding box.
+        This is saved for future smart placement.
+    */
+
+    let alphaBounds =
+        getAlphaBounds(
+            ctx,
+            width,
+            height
+        );
+
+
+    return {
+        dataURL,
+        width,
+        height,
+        alphaBounds
+    };
+
+}
+
+
+function getAlphaBounds(
+    ctx,
+    width,
+    height
+) {
+
+    try {
+
+        const imageData =
+            ctx.getImageData(
+                0,
+                0,
+                width,
+                height
+            );
+
+        const data =
+            imageData.data;
+
+        let minX =
+            width;
+
+        let minY =
+            height;
+
+        let maxX =
+            -1;
+
+        let maxY =
+            -1;
+
+
+        /*
+            For very large images we sample every
+            second pixel to keep importing fast.
+        */
+
+        const step =
+            width * height > 1000000
+                ? 2
+                : 1;
+
+
+        for (
+            let y = 0;
+            y < height;
+            y += step
+        ) {
+
+            for (
+                let x = 0;
+                x < width;
+                x += step
+            ) {
+
+                const index =
+                    (y * width + x) * 4;
+
+                if (
+                    data[index + 3] >
+                    10
+                ) {
+
+                    if (x < minX)
+                        minX = x;
+
+                    if (y < minY)
+                        minY = y;
+
+                    if (x > maxX)
+                        maxX = x;
+
+                    if (y > maxY)
+                        maxY = y;
+
+                }
+
+            }
+
+        }
+
+
+        if (maxX < 0) {
+
+            return null;
+
+        }
+
+
+        return {
+            x: minX / width,
+            y: minY / height,
+            width: (maxX - minX) / width,
+            height: (maxY - minY) / height
+        };
+
+    } catch (error) {
+
+        return null;
+
+    }
+
+}
+
+
+/* ============================================================
+   FILE VALIDATION
+============================================================ */
+
+function isSupportedImage(file) {
+
+    if (!file) {
+
+        return false;
+
+    }
+
+
+    const name =
+        file.name ||
+        "";
+
+    const extension =
+        name
+            .toLowerCase()
+            .split(".")
+            .pop();
+
+
+    const allowedExtensions = [
+        "png",
+        "jpg",
+        "jpeg",
+        "webp"
+    ];
+
+
+    const allowedTypes = [
+        "image/png",
+        "image/jpeg",
+        "image/webp"
+    ];
+
+
+    /*
+        Some browsers return an empty MIME type
+        for local files. Therefore we accept
+        the extension as well.
+    */
+
+    return (
+        allowedExtensions.includes(
+            extension
+        ) ||
+        allowedTypes.includes(
+            file.type
+        )
+    );
+
+}
+
+
+/* ============================================================
+   IMPORT IMAGE
+============================================================ */
+
+async function importAsset(file) {
+
+    if (!file) {
+
+        return;
+
+    }
+
+
+    if (!isSupportedImage(file)) {
+
+        showToast(
+            "Please choose a PNG, JPG, JPEG or WebP image.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    updateStorageStatus(
+        "Importing image...",
+        "saving"
+    );
+
+
+    try {
+
+        const removeWhite =
+            document.getElementById(
+                "removeWhiteBackground"
+            ).checked;
+
+
+        const decoded =
+            await decodeImageFile(
+                file
+            );
+
+
+        const normalized =
+            normalizeImage(
+                decoded,
+                removeWhite
+            );
+
+
+        if (
+            decoded.source &&
+            decoded.isBitmap &&
+            typeof decoded.source.close ===
+            "function"
+        ) {
+
+            decoded.source.close();
+
+        }
+
+
+        const originalName =
+            file.name
+                .replace(
+                    /\.[^/.]+$/,
+                    ""
+                )
+                .trim();
+
+
+        const category =
+            currentImportCategory ||
+            "accessories";
+
+
+        const asset = {
+
+            id:
+                makeId("asset"),
+
+            name:
+                originalName ||
+                "New Item",
+
+            category,
+
+            dataURL:
+                normalized.dataURL,
+
+            width:
+                normalized.width,
+
+            height:
+                normalized.height,
+
+            alphaBounds:
+                normalized.alphaBounds,
+
+            favorite:
+                false,
+
+            createdAt:
+                Date.now()
+
+        };
+
+
+        await addAssetToDB(
+            asset
+        );
+
+
+        /*
+            If using IndexedDB/localStorage,
+            add the new asset to our runtime array.
+        */
+
+        const existingIndex =
+            assets.findIndex(
+                item => item.id === asset.id
+            );
+
+        if (
+            existingIndex >= 0
+        ) {
+
+            assets[existingIndex] =
+                asset;
+
+        } else {
+
+            assets.push(asset);
+
+        }
+
+
+        renderCategories();
+
+        closeModal(
+            "importModal"
+        );
+
+
+        updateStorageStatus(
+            storageMode === "indexedDB"
+                ? "Storage: IndexedDB"
+                : storageMode === "localStorage"
+                    ? "Storage: local"
+                    : "Storage: temporary",
+            "saved"
+        );
+
+
+        showToast(
+            "Image imported successfully.",
+            "success"
+        );
+
+
+        /*
+            Automatically place the newly imported
+            item on the doll.
+        */
+
+        addAssetToStage(
+            asset
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Image import error:",
+            error
+        );
+
+
+        updateStorageStatus(
+            "Import failed",
+            "error"
+        );
+
+
+        let message =
+            "Could not import this image.";
+
+
+        if (
+            error &&
+            error.name ===
+            "QuotaExceededError"
+        ) {
+
+            message =
+                "The image is too large for browser storage. Try a smaller PNG or JPG.";
+
+        } else if (
+            error &&
+            /storage|quota/i.test(
+                error.message || ""
+            )
+        ) {
+
+            message =
+                "Browser storage is full or restricted. Try using localhost or your website.";
+
+        } else if (
+            error &&
+            /decode|image/i.test(
+                error.message || ""
+            )
+        ) {
+
+            message =
+                "The browser could not decode this image. Re-save it as a standard PNG or JPG and try again.";
+
+        }
+
+
+        showToast(
+            message,
+            "error"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   CATEGORY RENDERING
+============================================================ */
+
+let currentImportCategory =
+    "accessories";
+
+
+function renderCategories() {
+
+    categoriesContainer.innerHTML = "";
+
+
+    CATEGORIES.forEach(category => {
+
+        const wrapper =
+            document.createElement(
+                "div"
+            );
+
+        wrapper.className =
+            "category";
+
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+        button.className =
+            "category-btn";
+
+        button.innerHTML =
+            `<span>${escapeHtml(category.name)}</span><span>›</span>`;
+
+
+        const items =
+            document.createElement(
+                "div"
+            );
+
+        items.className =
+            "category-items";
+
+
+        if (
+            category.id ===
+            "my-closet"
+        ) {
+
+            const openCloset =
+                document.createElement(
+                    "button"
+                );
+
+            openCloset.className =
+                "add-category-item";
+
+            openCloset.textContent =
+                "Open My Closet";
+
+            openCloset.onclick =
+                openClosetModal;
+
+            items.appendChild(
+                openCloset
+            );
+
+        } else {
+
+            const addButton =
+                document.createElement(
+                    "button"
+                );
+
+            addButton.className =
+                "add-category-item";
+
+            addButton.textContent =
+                "+ Add / Import";
+
+            addButton.onclick =
+                function() {
+
+                    currentImportCategory =
+                        category.id;
+
+                    openModal(
+                        "importModal"
+                    );
+
+                };
+
+            items.appendChild(
+                addButton
+            );
+
+
+            /*
+                Existing items in this category.
+            */
+
+            const categoryAssets =
+                assets
+                    .filter(
+                        asset =>
+                            asset.category ===
+                            category.id
+                    )
+                    .sort(
+                        (a, b) =>
+                            b.createdAt -
+                            a.createdAt
+                    )
+                    .slice(0, 8);
+
+
+            categoryAssets.forEach(
+                asset => {
+
+                    const assetButton =
+                        document.createElement(
+                            "button"
+                        );
+
+                    assetButton.className =
+                        "add-category-item";
+
+                    assetButton.textContent =
+                        asset.favorite
+                            ? "★ " + asset.name
+                            : asset.name;
+
+                    assetButton.title =
+                        "Add " +
+                        asset.name +
+                        " to the doll";
+
+                    assetButton.onclick =
+                        function() {
+
+                            addAssetToStage(
+                                asset
+                            );
+
+                        };
+
+                    items.appendChild(
+                        assetButton
+                    );
+
+                }
+            );
+
+        }
+
+
+        button.onclick =
+            function() {
+
+                items.classList.toggle(
+                    "open"
+                );
+
+            };
+
+
+        wrapper.appendChild(
+            button
+        );
+
+        wrapper.appendChild(
+            items
+        );
+
+        categoriesContainer.appendChild(
+            wrapper
+        );
+
+    });
+
+}
+
+
+/* ============================================================
+   DEFAULT POSITION
+============================================================ */
+
+function getDefaultPosition(
+    category
+) {
+
+    const defaults = {
+
+        doll: {
+            x: 50,
+            y: 55,
+            width: 38
+        },
+
+        hair: {
+            x: 50,
+            y: 25,
+            width: 27
+        },
+
+        outfit: {
+            x: 50,
+            y: 53,
+            width: 38
+        },
+
+        top: {
+            x: 50,
+            y: 43,
+            width: 30
+        },
+
+        bottom: {
+            x: 50,
+            y: 67,
+            width: 32
+        },
+
+        shoes: {
+            x: 50,
+            y: 87,
+            width: 17
+        },
+
+        bags: {
+            x: 70,
+            y: 60,
+            width: 15
+        },
+
+        accessories: {
+            x: 50,
+            y: 34,
+            width: 12
+        },
+
+        hats: {
+            x: 50,
+            y: 20,
+            width: 20
+        },
+
+        glasses: {
+            x: 50,
+            y: 34,
+            width: 10
+        },
+
+        earrings: {
+            x: 45,
+            y: 38,
+            width: 5
+        },
+
+        necklaces: {
+            x: 50,
+            y: 39,
+            width: 13
+        },
+
+        bracelets: {
+            x: 40,
+            y: 55,
+            width: 6
+        },
+
+        belts: {
+            x: 50,
+            y: 52,
+            width: 22
+        },
+
+        coats: {
+            x: 50,
+            y: 53,
+            width: 40
+        },
+
+        scarves: {
+            x: 50,
+            y: 37,
+            width: 15
+        },
+
+        capes: {
+            x: 50,
+            y: 53,
+            width: 45
+        },
+
+        wings: {
+            x: 50,
+            y: 50,
+            width: 50
+        },
+
+        objects: {
+            x: 68,
+            y: 55,
+            width: 16
+        }
+
+    };
+
+
+    return (
+        defaults[category] ||
+        defaults.accessories
+    );
+
+}
+
+
+/* ============================================================
+   SMART POSITION
+============================================================ */
+
+function getSmartPosition(
+    asset
+) {
+
+    const defaultPosition =
+        getDefaultPosition(
+            asset.category
+        );
+
+
+    const doll =
+        gameItems.find(
+            item =>
+                item.category ===
+                "doll"
+        );
+
+
+    if (!doll) {
+
+        return {
+            ...defaultPosition
+        };
+
+    }
+
+
+    const result = {
+        ...defaultPosition
+    };
+
+
+    /*
+        Use doll dimensions to make accessories
+        roughly follow the doll.
+
+        This is intentionally a starting point,
+        not a permanent position.
+    */
+
+    switch (
+        asset.category
+    ) {
+
+        case "hair":
+
+            result.x =
+                doll.x;
+
+            result.y =
+                doll.y - 27;
+
+            result.width =
+                Math.max(
+                    20,
+                    doll.width * 0.78
+                );
+
+            break;
+
+
+        case "hats":
+
+            result.x =
+                doll.x;
+
+            result.y =
+                doll.y - 38;
+
+            result.width =
+                doll.width * 0.48;
+
+            break;
+
+
+        case "glasses":
+
+            result.x =
+                doll.x;
+
+            result.y =
+                doll.y - 17;
+
+            result.width =
+                doll.width * 0.28;
+
+            break;
+
+
+        case "necklaces":
+
+            result.x =
+                doll.x;
+
+            result.y =
+                doll.y - 5;
+
+            result.width =
+                doll.width * 0.34;
+
+            break;
+
+
+        case "earrings":
+
+            result.x =
+                doll.x -
+                doll.width * 0.20;
+
+            result.y =
+                doll.y - 7;
+
+            result.width =
+                5;
+
+            break;
+
+
+        case "top":
+
+            result.x =
+                doll.x;
+
+            result.y =
+                doll.y - 7;
+
+            result.width =
+                doll.width * 0.80;
+
+            break;
+
+
+        case "bottom":
+
+            result.x =
+                doll.x;
+
+            result.y =
+                doll.y + 17;
+
+            result.width =
+                doll.width * 0.84;
+
+            break;
+
+
+        case "shoes":
+
+            result.x =
+                doll.x;
+
+            result.y =
+                doll.y + 34;
+
+            result.width =
+                doll.width * 0.43;
+
+            break;
+
+
+        case "belts":
+
+            result.x =
+                doll.x;
+
+            result.y =
+                doll.y + 7;
+
+            result.width =
+                doll.width * 0.62;
+
+            break;
+
+
+        case "bags":
+
+            result.x =
+                doll.x +
+                doll.width * 0.62;
+
+            result.y =
+                doll.y + 10;
+
+            result.width =
+                doll.width * 0.35;
+
+            break;
+
+
+        case "bracelets":
+
+            result.x =
+                doll.x -
+                doll.width * 0.25;
+
+            result.y =
+                doll.y + 9;
+
+            result.width =
+                6;
+
+            break;
+
+
+        case "coats":
+
+            result.x =
+                doll.x;
+
+            result.y =
+                doll.y + 4;
+
+            result.width =
+                doll.width * 1.02;
+
+            break;
+
+
+        case "scarves":
+
+            result.x =
+                doll.x;
+
+            result.y =
+                doll.y - 2;
+
+            result.width =
+                doll.width * 0.45;
+
+            break;
+
+
+        case "capes":
+
+            result.x =
+                doll.x;
+
+            result.y =
+                doll.y + 5;
+
+            result.width =
+                doll.width * 1.15;
+
+            break;
+
+
+        case "wings":
+
+            result.x =
+                doll.x;
+
+            result.y =
+                doll.y + 2;
+
+            result.width =
+                doll.width * 1.35;
+
+            break;
+
+    }
+
+
+    return result;
+
+}
+
+
+/* ============================================================
+   LAYER ORDER
+============================================================ */
+
+function getLayerZ(
+    category
+) {
+
+    const layers = {
+
+        background: 1,
+
+        wings: 15,
+
+        doll: 20,
+
+        bottom: 30,
+
+        shoes: 35,
+
+        outfit: 40,
+
+        coats: 45,
+
+        top: 50,
+
+        belts: 55,
+
+        scarves: 60,
+
+        hair: 70,
+
+        hats: 75,
+
+        glasses: 80,
+
+        necklaces: 81,
+
+        earrings: 82,
+
+        bracelets: 83,
+
+        accessories: 85,
+
+        bags: 90,
+
+        objects: 95
+
+    };
+
+
+    return (
+        layers[category] ||
+        50
+    );
+
+}
+
+
+/* ============================================================
+   ADD ASSET TO STAGE
+============================================================ */
+
+function addAssetToStage(
+    asset
+) {
+
+    if (!asset) {
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    /*
+        Backgrounds are handled separately.
+    */
+
+    if (
+        asset.category ===
+        "background"
+    ) {
+
+        currentBackground =
+            asset.id;
+
+        renderBackground();
+
+        scheduleAutosave();
+
+        showToast(
+            "Background added.",
+            "success"
+        );
+
+        return;
+
+    }
+
+
+    const position =
+        getSmartPosition(
+            asset
+        );
+
+
+    const item = {
+
+        id:
+            makeId("item"),
+
+        assetId:
+            asset.id,
+
+        category:
+            asset.category,
+
+        name:
+            asset.name,
+
+        x:
+            position.x,
+
+        y:
+            position.y,
+
+        width:
+            position.width,
+
+        rotation:
+            0,
+
+        scaleX:
+            1,
+
+        scaleY:
+            1,
+
+        z:
+            Math.max(
+                zCounter++,
+                getLayerZ(
+                    asset.category
+                )
+            ),
+
+        locked:
+            false,
+
+        hidden:
+            false
+
+    };
+
+
+    gameItems.push(
+        item
+    );
+
+
+    selectItem(
+        item.id
+    );
+
+
+    renderStage();
+
+    scheduleAutosave();
+
+
+    showToast(
+        asset.name +
+        " added.",
+        "success"
+    );
+
+}
+
+
+/* ============================================================
+   RENDER STAGE
+============================================================ */
+
+function renderStage() {
+
+    /*
+        Remove all old stage items.
+    */
+
+    stage
+        .querySelectorAll(
+            ".stage-item"
+        )
+        .forEach(
+            element =>
+                element.remove()
+        );
+
+
+    /*
+        Empty message.
+    */
+
+    emptyStage.style.display =
+        gameItems.length === 0
+            ? "flex"
+            : "none";
+
+
+    /*
+        Sort by z.
+    */
+
+    const visibleItems =
+        gameItems
+            .slice()
+            .sort(
+                (a, b) =>
+                    a.z - b.z
+            );
+
+
+    visibleItems.forEach(
+        item => {
+
+            if (item.hidden) {
+
+                return;
+
+            }
+
+
+            const asset =
+                assets.find(
+                    a =>
+                        a.id ===
+                        item.assetId
+                );
+
+
+            if (!asset) {
+
+                return;
+
+            }
+
+
+            const element =
+                document.createElement(
+                    "div"
+                );
+
+
+            element.className =
+                "stage-item" +
+                (
+                    selectedItemId ===
+                    item.id
+                        ? " selected"
+                        : ""
+                ) +
+                (
+                    item.locked
+                        ? " locked"
+                        : ""
+                );
+
+
+            element.dataset.id =
+                item.id;
+
+
+            element.style.left =
+                item.x + "%";
+
+            element.style.top =
+                item.y + "%";
+
+            element.style.width =
+                item.width + "%";
+
+            element.style.zIndex =
+                item.z;
+
+
+            element.style.transform =
+                `
+                translate(-50%, -50%)
+                rotate(${item.rotation}deg)
+                scaleX(${item.scaleX})
+                scaleY(${item.scaleY})
+                `;
+
+
+            const image =
+                document.createElement(
+                    "img"
+                );
+
+            image.src =
+                asset.dataURL;
+
+            image.alt =
+                item.name || "Doll item";
+
+            image.draggable =
+                false;
+
+
+            const label =
+                document.createElement(
+                    "div"
+                );
+
+            label.className =
+                "item-label";
+
+            label.textContent =
+                item.name;
+
+
+            const resizeHandle =
+                document.createElement(
+                    "div"
+                );
+
+            resizeHandle.className =
+                "resize-handle";
+
+
+            const rotateHandle =
+                document.createElement(
+                    "div"
+                );
+
+            rotateHandle.className =
+                "rotate-handle";
+
+
+            element.appendChild(
+                image
+            );
+
+            element.appendChild(
+                label
+            );
+
+            element.appendChild(
+                resizeHandle
+            );
+
+            element.appendChild(
+                rotateHandle
+            );
+
+
+            /*
+                Select item.
+            */
+
+            element.addEventListener(
+                "pointerdown",
+                function(event) {
+
+                    if (
+                        event.target ===
+                        resizeHandle ||
+                        event.target ===
+                        rotateHandle
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    event.preventDefault();
+
+                    selectItem(
+                        item.id
+                    );
+
+
+                    if (
+                        item.locked
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    startDragging(
+                        event,
+                        item
+                    );
+
+                }
+            );
+
+
+            /*
+                Resize.
+            */
+
+            resizeHandle.addEventListener(
+                "pointerdown",
+                function(event) {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    startResize(
+                        event,
+                        item
+                    );
+
+                }
+            );
+
+
+            /*
+                Rotate.
+            */
+
+            rotateHandle.addEventListener(
+                "pointerdown",
+                function(event) {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    startRotate(
+                        event,
+                        item
+                    );
+
+                }
+            );
+
+
+            /*
+                Double click:
+                rename.
+            */
+
+            element.addEventListener(
+                "dblclick",
+                function(event) {
+
+                    event.preventDefault();
+
+                    renameStageItem(
+                        item
+                    );
+
+                }
+            );
+
+
+            stage.appendChild(
+                element
+            );
+
+        }
+    );
+
+
+    renderBackground();
+
+}
+
+
+/* ============================================================
+   BACKGROUND
+============================================================ */
+
+function renderBackground() {
+
+    backgroundLayer.innerHTML = "";
+
+
+    if (!currentBackground) {
+
+        return;
+
+    }
+
+
+    const asset =
+        assets.find(
+            item =>
+                item.id ===
+                currentBackground
+        );
+
+
+    if (!asset) {
+
+        return;
+
+    }
+
+
+    const image =
+        document.createElement(
+            "img"
+        );
+
+    image.src =
+        asset.dataURL;
+
+    image.alt =
+        asset.name;
+
+
+    backgroundLayer.appendChild(
+        image
+    );
+
+}
+
+
+/* ============================================================
+   SELECTION
+============================================================ */
+
+function selectItem(
+    id
+) {
+
+    selectedItemId =
+        id;
+
+
+    renderStage();
+
+}
+
+
+function getSelectedItem() {
+
+    return gameItems.find(
+        item =>
+            item.id ===
+            selectedItemId
+    );
+
+}
+
+
+/* ============================================================
+   DRAGGING
+============================================================ */
+
+function getStagePoint(
+    event
+) {
+
+    const rect =
+        stage.getBoundingClientRect();
+
+    return {
+
+        x:
+            (event.clientX -
+                rect.left) /
+            rect.width *
+            100,
+
+        y:
+            (event.clientY -
+                rect.top) /
+            rect.height *
+            100
+
+    };
+
+}
+
+
+function startDragging(
+    event,
+    item
+) {
+
+    if (item.locked) {
+
+        return;
+
+    }
+
+
+    const point =
+        getStagePoint(
+            event
+        );
+
+
+    pointerState = {
+
+        type:
+            "drag",
+
+        pointerId:
+            event.pointerId,
+
+        itemId:
+            item.id,
+
+        startX:
+            point.x,
+
+        startY:
+            point.y,
+
+        originalX:
+            item.x,
+
+        originalY:
+            item.y,
+
+        historySaved:
+            false
+
+    };
+
+
+    try {
+
+        event.currentTarget.setPointerCapture(
+            event.pointerId
+        );
+
+    } catch (error) {
+
+        /* ignore */
+
+    }
+
+
+    document.addEventListener(
+        "pointermove",
+        handlePointerMove
+    );
+
+    document.addEventListener(
+        "pointerup",
+        handlePointerUp,
+        {
+            once: true
+        }
+    );
+
+}
+
+
+function handlePointerMove(
+    event
+) {
+
+    if (!pointerState) {
+
+        return;
+
+    }
+
+
+    const item =
+        gameItems.find(
+            i =>
+                i.id ===
+                pointerState.itemId
+        );
+
+
+    if (!item) {
+
+        return;
+
+    }
+
+
+    const point =
+        getStagePoint(
+            event
+        );
+
+
+    if (
+        pointerState.type ===
+        "drag"
+    ) {
+
+        const dx =
+            point.x -
+            pointerState.startX;
+
+        const dy =
+            point.y -
+            pointerState.startY;
+
+
+        if (
+            !pointerState.historySaved
+        ) {
+
+            /*
+                History was already saved when
+                the operation started.
+            */
+
+            pointerState.historySaved =
+                true;
+
+        }
+
+
+        item.x =
+            pointerState.originalX +
+            dx;
+
+        item.y =
+            pointerState.originalY +
+            dy;
+
+
+        clampItem(
+            item
+        );
+
+
+        renderStage();
+
+    }
+
+
+    if (
+        pointerState.type ===
+        "resize"
+    ) {
+
+        const dx =
+            point.x -
+            pointerState.startX;
+
+
+        const newWidth =
+            pointerState.originalWidth +
+            dx;
+
+
+        item.width =
+            Math.max(
+                2,
+                Math.min(
+                    95,
+                    newWidth
+                )
+            );
+
+
+        renderStage();
+
+    }
+
+
+    if (
+        pointerState.type ===
+        "rotate"
+    ) {
+
+        const rect =
+            stage.getBoundingClientRect();
+
+
+        const centerX =
+            rect.left +
+            rect.width *
+            (item.x / 100);
+
+        const centerY =
+            rect.top +
+            rect.height *
+            (item.y / 100);
+
+
+        const angle =
+            Math.atan2(
+                event.clientY -
+                centerY,
+
+                event.clientX -
+                centerX
+            ) *
+            180 /
+            Math.PI;
+
+
+        item.rotation =
+            pointerState.originalRotation +
+            (
+                angle -
+                pointerState.startAngle
+            );
+
+
+        renderStage();
+
+    }
+
+}
+
+
+function handlePointerUp() {
+
+    if (!pointerState) {
+
+        return;
+
+    }
+
+
+    pointerState =
+        null;
+
+
+    document.removeEventListener(
+        "pointermove",
+        handlePointerMove
+    );
+
+
+    scheduleAutosave();
+
+}
+
+
+/* ============================================================
+   RESIZE
+============================================================ */
+
+function startResize(
+    event,
+    item
+) {
+
+    if (item.locked) {
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    const point =
+        getStagePoint(
+            event
+        );
+
+
+    pointerState = {
+
+        type:
+            "resize",
+
+        pointerId:
+            event.pointerId,
+
+        itemId:
+            item.id,
+
+        startX:
+            point.x,
+
+        originalWidth:
+            item.width
+
+    };
+
+
+    try {
+
+        event.currentTarget.setPointerCapture(
+            event.pointerId
+        );
+
+    } catch (error) {
+
+        /* ignore */
+
+    }
+
+
+    document.addEventListener(
+        "pointermove",
+        handlePointerMove
+    );
+
+    document.addEventListener(
+        "pointerup",
+        handlePointerUp,
+        {
+            once: true
+        }
+    );
+
+}
+
+
+/* ============================================================
+   ROTATION
+============================================================ */
+
+function startRotate(
+    event,
+    item
+) {
+
+    if (item.locked) {
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    const rect =
+        stage.getBoundingClientRect();
+
+
+    const centerX =
+        rect.left +
+        rect.width *
+        (item.x / 100);
+
+    const centerY =
+        rect.top +
+        rect.height *
+        (item.y / 100);
+
+
+    const startAngle =
+        Math.atan2(
+            event.clientY -
+            centerY,
+
+            event.clientX -
+            centerX
+        ) *
+        180 /
+        Math.PI;
+
+
+    pointerState = {
+
+        type:
+            "rotate",
+
+        pointerId:
+            event.pointerId,
+
+        itemId:
+            item.id,
+
+        startAngle,
+
+        originalRotation:
+            item.rotation
+
+    };
+
+
+    try {
+
+        event.currentTarget.setPointerCapture(
+            event.pointerId
+        );
+
+    } catch (error) {
+
+        /* ignore */
+
+    }
+
+
+    document.addEventListener(
+        "pointermove",
+        handlePointerMove
+    );
+
+    document.addEventListener(
+        "pointerup",
+        handlePointerUp,
+        {
+            once: true
+        }
+    );
+
+}
+
+
+/* ============================================================
+   CLAMP ITEM
+============================================================ */
+
+function clampItem(
+    item
+) {
+
+    item.x =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                item.x
+            )
+        );
+
+
+    item.y =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                item.y
+            )
+        );
+
+
+    item.width =
+        Math.max(
+            2,
+            Math.min(
+                95,
+                item.width
+            )
+        );
+
+}
+
+
+/* ============================================================
+   RENAME STAGE ITEM
+============================================================ */
+
+function renameStageItem(
+    item
+) {
+
+    const name =
+        prompt(
+            "Enter a new name:",
+            item.name
+        );
+
+
+    if (
+        !name ||
+        !name.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    item.name =
+        name.trim();
+
+
+    renderStage();
+
+    scheduleAutosave();
+
+}
+
+
+/* ============================================================
+   HISTORY
+============================================================ */
+
+function createSnapshot() {
+
+    return {
+
+        gameItems:
+            JSON.parse(
+                JSON.stringify(
+                    gameItems
+                )
+            ),
+
+        selectedItemId:
+            selectedItemId,
+
+        currentBackground:
+            currentBackground,
+
+        zCounter:
+            zCounter
+
+    };
+
+}
+
+
+function pushHistory() {
+
+    if (isRestoring) {
+
+        return;
+
+    }
+
+
+    history.push(
+        createSnapshot()
+    );
+
+
+    if (
+        history.length >
+        50
+    ) {
+
+        history.shift();
+
+    }
+
+
+    future = [];
+
+}
+
+
+function restoreSnapshot(
+    snapshot
+) {
+
+    if (!snapshot) {
+
+        return;
+
+    }
+
+
+    isRestoring =
+        true;
+
+
+    gameItems =
+        JSON.parse(
+            JSON.stringify(
+                snapshot.gameItems
+            )
+        );
+
+    selectedItemId =
+        snapshot.selectedItemId;
+
+    currentBackground =
+        snapshot.currentBackground;
+
+    zCounter =
+        snapshot.zCounter;
+
+
+    isRestoring =
+        false;
+
+
+    renderStage();
+
+    scheduleAutosave();
+
+}
+
+
+function undo() {
+
+    if (
+        history.length === 0
+    ) {
+
+        showToast(
+            "Nothing to undo."
+        );
+
+        return;
+
+    }
+
+
+    const current =
+        createSnapshot();
+
+
+    future.push(
+        current
+    );
+
+
+    const previous =
+        history.pop();
+
+
+    restoreSnapshot(
+        previous
+    );
+
+}
+
+
+function redo() {
+
+    if (
+        future.length === 0
+    ) {
+
+        showToast(
+            "Nothing to redo."
+        );
+
+        return;
+
+    }
+
+
+    const current =
+        createSnapshot();
+
+
+    history.push(
+        current
+    );
+
+
+    const next =
+        future.pop();
+
+
+    restoreSnapshot(
+        next
+    );
+
+}
+
+
+/* ============================================================
+   TOOLBAR ACTIONS
+============================================================ */
+
+function centerSelected() {
+
+    const item =
+        getSelectedItem();
+
+    if (!item) {
+
+        showToast(
+            "Select an item first."
+        );
+
+        return;
+
+    }
+
+
+    if (item.locked) {
+
+        showToast(
+            "This item is locked."
+        );
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    item.x =
+        50;
+
+    item.y =
+        50;
+
+
+    renderStage();
+
+    scheduleAutosave();
+
+}
+
+
+function duplicateSelected() {
+
+    const item =
+        getSelectedItem();
+
+    if (!item) {
+
+        showToast(
+            "Select an item first."
+        );
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    const duplicate =
+        JSON.parse(
+            JSON.stringify(
+                item
+            )
+        );
+
+
+    duplicate.id =
+        makeId("item");
+
+    duplicate.name =
+        item.name +
+        " Copy";
+
+    duplicate.x +=
+        5;
+
+    duplicate.y +=
+        5;
+
+    duplicate.z =
+        ++zCounter;
+
+
+    gameItems.push(
+        duplicate
+    );
+
+
+    selectedItemId =
+        duplicate.id;
+
+
+    renderStage();
+
+    scheduleAutosave();
+
+}
+
+
+function moveForward() {
+
+    const item =
+        getSelectedItem();
+
+    if (!item) {
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+    item.z =
+        ++zCounter;
+
+    renderStage();
+
+    scheduleAutosave();
+
+}
+
+
+function moveBackward() {
+
+    const item =
+        getSelectedItem();
+
+    if (!item) {
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    const lower =
+        Math.max(
+            1,
+            item.z - 1
+        );
+
+
+    item.z =
+        lower;
+
+
+    renderStage();
+
+    scheduleAutosave();
+
+}
+
+
+function rotateSelected(
+    degrees
+) {
+
+    const item =
+        getSelectedItem();
+
+    if (
+        !item ||
+        item.locked
+    ) {
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    item.rotation +=
+        degrees;
+
+
+    renderStage();
+
+    scheduleAutosave();
+
+}
+
+
+function flipHorizontal() {
+
+    const item =
+        getSelectedItem();
+
+    if (
+        !item ||
+        item.locked
+    ) {
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    item.scaleX *=
+        -1;
+
+
+    renderStage();
+
+    scheduleAutosave();
+
+}
+
+
+function flipVertical() {
+
+    const item =
+        getSelectedItem();
+
+    if (
+        !item ||
+        item.locked
+    ) {
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    item.scaleY *=
+        -1;
+
+
+    renderStage();
+
+    scheduleAutosave();
+
+}
+
+
+function toggleLock() {
+
+    const item =
+        getSelectedItem();
+
+    if (!item) {
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    item.locked =
+        !item.locked;
+
+
+    renderStage();
+
+    scheduleAutosave();
+
+
+    showToast(
+        item.locked
+            ? "Item locked."
+            : "Item unlocked."
+    );
+
+}
+
+
+function toggleHide() {
+
+    const item =
+        getSelectedItem();
+
+    if (!item) {
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    item.hidden =
+        !item.hidden;
+
+
+    renderStage();
+
+    scheduleAutosave();
+
+}
+
+
+function deleteSelected() {
+
+    const item =
+        getSelectedItem();
+
+    if (!item) {
+
+        showToast(
+            "Select an item first."
+        );
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    gameItems =
+        gameItems.filter(
+            current =>
+                current.id !==
+                item.id
+        );
+
+
+    selectedItemId =
+        null;
+
+
+    renderStage();
+
+    scheduleAutosave();
+
+}
+
+
+/* ============================================================
+   DELETE ASSET
+============================================================ */
+
+async function removeAsset(
+    asset
+) {
+
+    if (!asset) {
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            `Delete "${asset.name}" from your wardrobe?`
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        await deleteAssetFromDB(
+            asset.id
+        );
+
+
+        assets =
+            assets.filter(
+                item =>
+                    item.id !==
+                    asset.id
+            );
+
+
+        /*
+            Remove stage items using
+            this asset.
+        */
+
+        const removed =
+            gameItems.filter(
+                item =>
+                    item.assetId ===
+                    asset.id
+            );
+
+
+        if (
+            removed.length > 0
+        ) {
+
+            pushHistory();
+
+            gameItems =
+                gameItems.filter(
+                    item =>
+                        item.assetId !==
+                        asset.id
+                );
+
+        }
+
+
+        if (
+            currentBackground ===
+            asset.id
+        ) {
+
+            currentBackground =
+                null;
+
+        }
+
+
+        renderCategories();
+
+        renderStage();
+
+        renderCloset();
+
+        scheduleAutosave();
+
+
+        showToast(
+            "Item deleted.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+        showToast(
+            "Could not delete this item.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   FAVORITE
+============================================================ */
+
+async function toggleFavorite(
+    asset
+) {
+
+    asset.favorite =
+        !asset.favorite;
+
+
+    try {
+
+        await addAssetToDB(
+            asset
+        );
+
+
+        const index =
+            assets.findIndex(
+                item =>
+                    item.id ===
+                    asset.id
+            );
+
+
+        if (index >= 0) {
+
+            assets[index] =
+                asset;
+
+        }
+
+
+        renderCategories();
+
+        renderCloset();
+
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+        showToast(
+            "Could not save favorite.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   RENAME ASSET
+============================================================ */
+
+async function renameAsset(
+    asset
+) {
+
+    const newName =
+        prompt(
+            "Rename wardrobe item:",
+            asset.name
+        );
+
+
+    if (
+        !newName ||
+        !newName.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    asset.name =
+        newName.trim();
+
+
+    try {
+
+        await addAssetToDB(
+            asset
+        );
+
+
+        const index =
+            assets.findIndex(
+                item =>
+                    item.id ===
+                    asset.id
+            );
+
+
+        if (index >= 0) {
+
+            assets[index] =
+                asset;
+
+        }
+
+
+        renderCategories();
+
+        renderCloset();
+
+
+        showToast(
+            "Item renamed.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        showToast(
+            "Could not rename item.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   DUPLICATE ASSET
+============================================================ */
+
+async function duplicateAsset(
+    asset
+) {
+
+    const duplicate =
+        JSON.parse(
+            JSON.stringify(
+                asset
+            )
+        );
+
+
+    duplicate.id =
+        makeId("asset");
+
+    duplicate.name =
+        asset.name +
+        " Copy";
+
+    duplicate.createdAt =
+        Date.now();
+
+
+    try {
+
+        await addAssetToDB(
+            duplicate
+        );
+
+
+        assets.push(
+            duplicate
+        );
+
+
+        renderCategories();
+
+        renderCloset();
+
+
+        showToast(
+            "Item duplicated.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+        showToast(
+            "Could not duplicate item.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   CLOSET
+============================================================ */
+
+function openClosetModal() {
+
+    renderCloset();
+
+    openModal(
+        "closetModal"
+    );
+
+}
+
+
+function renderCloset() {
+
+    const grid =
+        document.getElementById(
+            "assetGrid"
+        );
+
+
+    const search =
+        document.getElementById(
+            "closetSearch"
+        ).value
+            .trim()
+            .toLowerCase();
+
+
+    const sort =
+        document.getElementById(
+            "closetSort"
+        ).value;
+
+
+    let list =
+        assets.slice();
+
+
+    if (search) {
+
+        list =
+            list.filter(
+                asset =>
+                    asset.name
+                        .toLowerCase()
+                        .includes(
+                            search
+                        ) ||
+                    asset.category
+                        .toLowerCase()
+                        .includes(
+                            search
+                        )
+            );
+
+    }
+
+
+    if (favoriteFilter) {
+
+        list =
+            list.filter(
+                asset =>
+                    asset.favorite
+            );
+
+    }
+
+
+    if (sort === "newest") {
+
+        list.sort(
+            (a, b) =>
+                b.createdAt -
+                a.createdAt
+        );
+
+    } else if (
+        sort === "name"
+    ) {
+
+        list.sort(
+            (a, b) =>
+                a.name.localeCompare(
+                    b.name
+                )
+        );
+
+    } else if (
+        sort === "category"
+    ) {
+
+        list.sort(
+            (a, b) =>
+                a.category.localeCompare(
+                    b.category
+                )
+        );
+
+    }
+
+
+    grid.innerHTML = "";
+
+
+    if (
+        list.length === 0
+    ) {
+
+        const message =
+            document.createElement(
+                "div"
+            );
+
+        message.style.gridColumn =
+            "1 / -1";
+
+        message.style.textAlign =
+            "center";
+
+        message.style.padding =
+            "40px";
+
+        message.style.color =
+            "#888";
+
+        message.textContent =
+            "No wardrobe items found.";
+
+        grid.appendChild(
+            message
+        );
+
+        return;
+
+    }
+
+
+    list.forEach(
+        asset => {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "asset-card";
+
+
+            const preview =
+                document.createElement(
+                    "div"
+                );
+
+            preview.className =
+                "asset-preview";
+
+
+            const image =
+                document.createElement(
+                    "img"
+                );
+
+            image.src =
+                asset.dataURL;
+
+            image.alt =
+                asset.name;
+
+
+            preview.appendChild(
+                image
+            );
+
+
+            const info =
+                document.createElement(
+                    "div"
+                );
+
+            info.className =
+                "asset-info";
+
+
+            const name =
+                document.createElement(
+                    "div"
+                );
+
+            name.className =
+                "asset-name";
+
+            name.title =
+                asset.name;
+
+            name.textContent =
+                asset.name;
+
+
+            const category =
+                document.createElement(
+                    "div"
+                );
+
+            category.className =
+                "asset-category";
+
+            category.textContent =
+                asset.category;
+
+
+            const actions =
+                document.createElement(
+                    "div"
+                );
+
+            actions.className =
+                "asset-actions";
+
+
+            const use =
+                document.createElement(
+                    "button"
+                );
+
+            use.textContent =
+                "Use";
+
+            use.onclick =
+                () => {
+
+                    addAssetToStage(
+                        asset
+                    );
+
+                };
+
+
+            const favorite =
+                document.createElement(
+                    "button"
+                );
+
+            favorite.className =
+                "favorite-button" +
+                (
+                    asset.favorite
+                        ? " active"
+                        : ""
+                );
+
+            favorite.textContent =
+                asset.favorite
+                    ? "★ Favorite"
+                    : "☆ Favorite";
+
+            favorite.onclick =
+                () => {
+
+                    toggleFavorite(
+                        asset
+                    );
+
+                };
+
+
+            const rename =
+                document.createElement(
+                    "button"
+                );
+
+            rename.textContent =
+                "Rename";
+
+            rename.onclick =
+                () => {
+
+                    renameAsset(
+                        asset
+                    );
+
+                };
+
+
+            const duplicate =
+                document.createElement(
+                    "button"
+                );
+
+            duplicate.textContent =
+                "Duplicate";
+
+            duplicate.onclick =
+                () => {
+
+                    duplicateAsset(
+                        asset
+                    );
+
+                };
+
+
+            const deleteButton =
+                document.createElement(
+                    "button"
+                );
+
+            deleteButton.textContent =
+                "Delete";
+
+            deleteButton.className =
+                "delete-asset";
+
+            deleteButton.onclick =
+                () => {
+
+                    removeAsset(
+                        asset
+                    );
+
+                };
+
+
+            actions.appendChild(
+                use
+            );
+
+            actions.appendChild(
+                favorite
+            );
+
+            actions.appendChild(
+                rename
+            );
+
+            actions.appendChild(
+                duplicate
+            );
+
+            actions.appendChild(
+                deleteButton
+            );
+
+
+            info.appendChild(
+                name
+            );
+
+            info.appendChild(
+                category
+            );
+
+            info.appendChild(
+                actions
+            );
+
+
+            card.appendChild(
+                preview
+            );
+
+            card.appendChild(
+                info
+            );
+
+
+            grid.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   MODALS
+============================================================ */
+
+function openModal(
+    id
+) {
+
+    document
+        .getElementById(id)
+        .classList.add(
+            "open"
+        );
+
+}
+
+
+function closeModal(
+    id
+) {
+
+    document
+        .getElementById(id)
+        .classList.remove(
+            "open"
+        );
+
+}
+
+
+/* ============================================================
+   SAVED OUTFITS
+============================================================ */
+
+function getSavedOutfits() {
+
+    const raw =
+        safeLocalGet(
+            SAVED_OUTFITS_KEY
+        );
+
+
+    if (!raw) {
+
+        return [];
+
+    }
+
+
+    try {
+
+        const parsed =
+            JSON.parse(raw);
+
+        return Array.isArray(parsed)
+            ? parsed
+            : [];
+
+    } catch (error) {
+
+        return [];
+
+    }
+
+}
+
+
+function saveSavedOutfits(
+    outfits
+) {
+
+    return safeLocalSet(
+        SAVED_OUTFITS_KEY,
+        JSON.stringify(
+            outfits
+        )
+    );
+
+}
+
+
+/* ============================================================
+   EXPORT STAGE DATA
+============================================================ */
+
+function getStageExportData() {
+
+    return {
+
+        version:
+            1,
+
+        savedAt:
+            Date.now(),
+
+        currentBackground,
+
+        zCounter,
+
+        gameItems:
+            JSON.parse(
+                JSON.stringify(
+                    gameItems
+                )
+            )
+
+    };
+
+}
+
+
+/* ============================================================
+   DRAW OUTFIT THUMBNAIL
+============================================================ */
+
+async function createOutfitThumbnail() {
+
+    const canvas =
+        document.createElement(
+            "canvas"
+        );
+
+    canvas.width =
+        240;
+
+    canvas.height =
+        300;
+
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    ctx.fillStyle =
+        "#ffffff";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /*
+        Background
+    */
+
+    if (currentBackground) {
+
+        const background =
+            assets.find(
+                asset =>
+                    asset.id ===
+                    currentBackground
+            );
+
+
+        if (background) {
+
+            try {
+
+                const image =
+                    await loadImageFromURL(
+                        background.dataURL
+                    );
+
+
+                ctx.drawImage(
+                    image,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
+            } catch (error) {
+
+                console.warn(
+                    error
+                );
+
+            }
+
+        }
+
+    }
+
+
+    /*
+        Draw stage items in z order.
+    */
+
+    const sorted =
+        gameItems
+            .filter(
+                item =>
+                    !item.hidden
+            )
+            .slice()
+            .sort(
+                (a, b) =>
+                    a.z - b.z
+            );
+
+
+    for (
+        const item of sorted
+    ) {
+
+        const asset =
+            assets.find(
+                asset =>
+                    asset.id ===
+                    item.assetId
+            );
+
+
+        if (!asset) {
+
+            continue;
+
+        }
+
+
+        try {
+
+            const image =
+                await loadImageFromURL(
+                    asset.dataURL
+                );
+
+
+            const width =
+                canvas.width *
+                (
+                    item.width /
+                    100
+                );
+
+
+            const height =
+                width *
+                (
+                    asset.height /
+                    asset.width
+                );
+
+
+            const x =
+                canvas.width *
+                (
+                    item.x /
+                    100
+                );
+
+            const y =
+                canvas.height *
+                (
+                    item.y /
+                    100
+                );
+
+
+            ctx.save();
+
+            ctx.translate(
+                x,
+                y
+            );
+
+            ctx.rotate(
+                item.rotation *
+                Math.PI /
+                180
+            );
+
+            ctx.scale(
+                item.scaleX,
+                item.scaleY
+            );
+
+
+            ctx.drawImage(
+                image,
+                -width / 2,
+                -height / 2,
+                width,
+                height
+            );
+
+
+            ctx.restore();
+
+        } catch (error) {
+
+            console.warn(
+                "Thumbnail error:",
+                error
+            );
+
+        }
+
+    }
+
+
+    return canvas.toDataURL(
+        "image/jpeg",
+        0.82
+    );
+
+}
+
+
+/* ============================================================
+   SAVE OUTFIT
+============================================================ */
+
+async function saveCurrentOutfit() {
+
+    const name =
+        prompt(
+            "Name this outfit:",
+            "My Outfit " +
+            (
+                getSavedOutfits()
+                    .length + 1
+            )
+        );
+
+
+    if (
+        !name ||
+        !name.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    updateStorageStatus(
+        "Saving outfit...",
+        "saving"
+    );
+
+
+    try {
+
+        const thumbnail =
+            await createOutfitThumbnail();
+
+
+        const outfit = {
+
+            id:
+                makeId("outfit"),
+
+            name:
+                name.trim(),
+
+            createdAt:
+                Date.now(),
+
+            thumbnail,
+
+            data:
+                getStageExportData()
+
+        };
+
+
+        const outfits =
+            getSavedOutfits();
+
+
+        outfits.unshift(
+            outfit
+        );
+
+
+        /*
+            Keep the saved-outfit list reasonable.
+        */
+
+        if (
+            outfits.length >
+            30
+        ) {
+
+            outfits.length =
+                30;
+
+        }
+
+
+        const success =
+            saveSavedOutfits(
+                outfits
+            );
+
+
+        if (!success) {
+
+            throw new Error(
+                "Could not save outfit."
+            );
+
+        }
+
+
+        updateStorageStatus(
+            "Saved",
+            "saved"
+        );
+
+
+        showToast(
+            "Outfit saved.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+
+        updateStorageStatus(
+            "Save failed",
+            "error"
+        );
+
+
+        showToast(
+            "Could not save the outfit. Browser storage may be full.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   LOAD SAVED OUTFIT
+============================================================ */
+
+function openSavedOutfits() {
+
+    renderSavedOutfits();
+
+    openModal(
+        "savedModal"
+    );
+
+}
+
+
+function renderSavedOutfits() {
+
+    const container =
+        document.getElementById(
+            "savedList"
+        );
+
+
+    const outfits =
+        getSavedOutfits();
+
+
+    container.innerHTML = "";
+
+
+    if (
+        outfits.length === 0
+    ) {
+
+        const message =
+            document.createElement(
+                "div"
+            );
+
+        message.style.padding =
+            "40px";
+
+        message.style.textAlign =
+            "center";
+
+        message.style.color =
+            "#888";
+
+        message.textContent =
+            "No saved outfits yet.";
+
+        container.appendChild(
+            message
+        );
+
+        return;
+
+    }
+
+
+    outfits.forEach(
+        outfit => {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "saved-card";
+
+
+            const thumbnail =
+                document.createElement(
+                    "div"
+                );
+
+            thumbnail.className =
+                "saved-thumb";
+
+
+            const image =
+                document.createElement(
+                    "img"
+                );
+
+            image.src =
+                outfit.thumbnail;
+
+            image.alt =
+                outfit.name;
+
+
+            thumbnail.appendChild(
+                image
+            );
+
+
+            const info =
+                document.createElement(
+                    "div"
+                );
+
+            info.className =
+                "saved-info";
+
+
+            const name =
+                document.createElement(
+                    "div"
+                );
+
+            name.className =
+                "saved-name";
+
+            name.textContent =
+                outfit.name;
+
+
+            const date =
+                document.createElement(
+                    "div"
+                );
+
+            date.className =
+                "saved-date";
+
+            date.textContent =
+                new Date(
+                    outfit.createdAt
+                ).toLocaleString();
+
+
+            const actions =
+                document.createElement(
+                    "div"
+                );
+
+            actions.className =
+                "saved-actions";
+
+
+            const load =
+                document.createElement(
+                    "button"
+                );
+
+            load.textContent =
+                "Load";
+
+            load.onclick =
+                () => {
+
+                    loadOutfit(
+                        outfit
+                    );
+
+                };
+
+
+            const deleteButton =
+                document.createElement(
+                    "button"
+                );
+
+            deleteButton.textContent =
+                "Delete";
+
+            deleteButton.onclick =
+                () => {
+
+                    deleteSavedOutfit(
+                        outfit.id
+                    );
+
+                };
+
+
+            actions.appendChild(
+                load
+            );
+
+            actions.appendChild(
+                deleteButton
+            );
+
+
+            info.appendChild(
+                name
+            );
+
+            info.appendChild(
+                date
+            );
+
+            info.appendChild(
+                actions
+            );
+
+
+            card.appendChild(
+                thumbnail
+            );
+
+            card.appendChild(
+                info
+            );
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+function loadOutfit(
+    outfit
+) {
+
+    if (!outfit || !outfit.data) {
+
+        return;
+
+    }
+
+
+    pushHistory();
+
+
+    gameItems =
+        JSON.parse(
+            JSON.stringify(
+                outfit.data.gameItems ||
+                []
+            )
+        );
+
+
+    currentBackground =
+        outfit.data.currentBackground ||
+        null;
+
+
+    zCounter =
+        outfit.data.zCounter ||
+        10;
+
+
+    selectedItemId =
+        null;
+
+
+    renderStage();
+
+    scheduleAutosave();
+
+    closeModal(
+        "savedModal"
+    );
+
+
+    showToast(
+        "Outfit loaded.",
+        "success"
+    );
+
+}
+
+
+function deleteSavedOutfit(
+    id
+) {
+
+    const confirmed =
+        confirm(
+            "Delete this saved outfit?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    const outfits =
+        getSavedOutfits()
+            .filter(
+                outfit =>
+                    outfit.id !==
+                    id
+            );
+
+
+    saveSavedOutfits(
+        outfits
+    );
+
+
+    renderSavedOutfits();
+
+
+    showToast(
+        "Saved outfit deleted."
+    );
+
+}
+
+
+/* ============================================================
+   AUTOSAVE
+============================================================ */
+
+function createAutosaveData() {
+
+    return {
+
+        version:
+            2,
+
+        savedAt:
+            Date.now(),
+
+        gameItems:
+            JSON.parse(
+                JSON.stringify(
+                    gameItems
+                )
+            ),
+
+        selectedItemId,
+
+        currentBackground,
+
+        zCounter
+
+    };
+
+}
+
+
+function performAutosave() {
+
+    const data =
+        createAutosaveData();
+
+
+    const success =
+        safeLocalSet(
+            AUTOSAVE_KEY,
+            JSON.stringify(
+                data
+            )
+        );
+
+
+    if (success) {
+
+        updateStorageStatus(
+            "Auto-saved",
+            "saved"
+        );
+
+    } else {
+
+        updateStorageStatus(
+            "Auto-save unavailable",
+            "error"
+        );
+
+    }
+
+}
+
+
+function scheduleAutosave() {
+
+    clearTimeout(
+        autosaveTimer
+    );
+
+
+    updateStorageStatus(
+        "Saving...",
+        "saving"
+    );
+
+
+    autosaveTimer =
+        setTimeout(
+            performAutosave,
+            AUTOSAVE_DELAY
+        );
+
+}
+
+
+/* ============================================================
+   RESTORE AUTOSAVE
+============================================================ */
+
+function getAutosave() {
+
+    const raw =
+        safeLocalGet(
+            AUTOSAVE_KEY
+        );
+
+
+    if (!raw) {
+
+        return null;
+
+    }
+
+
+    try {
+
+        return JSON.parse(
+            raw
+        );
+
+    } catch (error) {
+
+        return null;
+
+    }
+
+}
+
+
+function restoreAutosaveIfAvailable() {
+
+    const data =
+        getAutosave();
+
+
+    if (
+        !data ||
+        !Array.isArray(
+            data.gameItems
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+        Don't automatically restore an empty session.
+    */
+
+    if (
+        data.gameItems.length ===
+        0 &&
+        !data.currentBackground
+    ) {
+
+        return;
+
+    }
+
+
+    const savedDate =
+        data.savedAt
+            ? new Date(
+                data.savedAt
+            ).toLocaleString()
+            : "";
+
+
+    const restore =
+        confirm(
+            "A previous session was automatically saved" +
+            (
+                savedDate
+                    ? "\n\nSaved: " +
+                      savedDate
+                    : ""
+            ) +
+            "\n\nRestore it?"
+        );
+
+
+    if (!restore) {
+
+        return;
+
+    }
+
+
+    gameItems =
+        JSON.parse(
+            JSON.stringify(
+                data.gameItems
+            )
+        );
+
+
+    selectedItemId =
+        data.selectedItemId ||
+        null;
+
+
+    currentBackground =
+        data.currentBackground ||
+        null;
+
+
+    zCounter =
+        data.zCounter ||
+        10;
+
+
+    renderStage();
+
+
+    updateStorageStatus(
+        "Session restored",
+        "saved"
+    );
+
+
+    showToast(
+        "Previous session restored.",
+        "success"
+    );
+
+}
+
+
+/* ============================================================
+   IMAGE DROP
+============================================================ */
+
+const importDrop =
+    document.getElementById(
+        "importDrop"
+    );
+
+
+importDrop.addEventListener(
+    "dragover",
+    function(event) {
+
+        event.preventDefault();
+
+        importDrop.classList.add(
+            "dragover"
+        );
+
+    }
+);
+
+
+importDrop.addEventListener(
+    "dragleave",
+    function() {
+
+        importDrop.classList.remove(
+            "dragover"
+        );
+
+    }
+);
+
+
+importDrop.addEventListener(
+    "drop",
+    async function(event) {
+
+        event.preventDefault();
+
+        importDrop.classList.remove(
+            "dragover"
+        );
+
+
+        const file =
+            event.dataTransfer.files[0];
+
+
+        if (file) {
+
+            await importAsset(
+                file
+            );
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   FILE INPUT
+============================================================ */
+
+document
+    .getElementById(
+        "fileInput"
+    )
+    .addEventListener(
+        "change",
+        async function(event) {
+
+            const file =
+                event.target.files[0];
+
+
+            if (file) {
+
+                await importAsset(
+                    file
+                );
+
+            }
+
+
+            /*
+                Reset input so selecting the
+                same file again triggers change.
+            */
+
+            event.target.value =
+                "";
+
+        }
+    );
+
+
+/* ============================================================
+   ZOOM
+============================================================ */
+
+function updateStageZoom(
+    value
+) {
+
+    stageZoom =
+        Number(value) /
+        100;
+
+
+    stage.style.transform =
+        `scale(${stageZoom})`;
+
+
+    stageWrapper.style.width =
+        (
+            stage.offsetWidth *
+            stageZoom
+        ) + "px";
+
+    stageWrapper.style.height =
+        (
+            stage.offsetHeight *
+            stageZoom
+        ) + "px";
+
+
+    document.getElementById(
+        "zoomValue"
+    ).textContent =
+        value + "%";
+
+}
+
+
+document
+    .getElementById(
+        "zoomSlider"
+    )
+    .addEventListener(
+        "input",
+        function(event) {
+
+            updateStageZoom(
+                event.target.value
+            );
+
+        }
+    );
+
+
+/* ============================================================
+   GRID
+============================================================ */
+
+document
+    .getElementById(
+        "gridBtn"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            stage.classList.toggle(
+                "grid"
+            );
+
+        }
+    );
+
+
+/* ============================================================
+   FULLSCREEN
+============================================================ */
+
+document
+    .getElementById(
+        "fullscreenBtn"
+    )
+    .addEventListener(
+        "click",
+        async function() {
+
+            try {
+
+                if (
+                    !document.fullscreenElement
+                ) {
+
+                    await document
+                        .documentElement
+                        .requestFullscreen();
+
+                } else {
+
+                    await document
+                        .exitFullscreen();
+
+                }
+
+            } catch (error) {
+
+                showToast(
+                    "Fullscreen is not available in this browser."
+                );
+
+            }
+
+        }
+    );
+
+
+/* ============================================================
+   KEYBOARD SHORTCUTS
+============================================================ */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        /*
+            Don't intercept typing in inputs.
+        */
+
+        const tag =
+            document.activeElement
+                ?.tagName
+                ?.toLowerCase();
+
+
+        if (
+            tag === "input" ||
+            tag === "textarea" ||
+            tag === "select"
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+            Delete
+        */
+
+        if (
+            event.key ===
+            "Delete"
+        ) {
+
+            event.preventDefault();
+
+            deleteSelected();
+
+        }
+
+
+        /*
+            Ctrl/Cmd + Z
+        */
+
+        if (
+            (event.ctrlKey ||
+                event.metaKey) &&
+            !event.shiftKey &&
+            event.key.toLowerCase() ===
+                "z"
+        ) {
+
+            event.preventDefault();
+
+            undo();
+
+        }
+
+
+        /*
+            Ctrl/Cmd + Shift + Z
+        */
+
+        if (
+            (event.ctrlKey ||
+                event.metaKey) &&
+            event.shiftKey &&
+            event.key.toLowerCase() ===
+                "z"
+        ) {
+
+            event.preventDefault();
+
+            redo();
+
+        }
+
+
+        /*
+            Ctrl/Cmd + D
+        */
+
+        if (
+            (event.ctrlKey ||
+                event.metaKey) &&
+            event.key.toLowerCase() ===
+                "d"
+        ) {
+
+            event.preventDefault();
+
+            duplicateSelected();
+
+        }
+
+
+        /*
+            Arrow keys move selected item.
+        */
+
+        const item =
+            getSelectedItem();
+
+
+        if (
+            item &&
+            !item.locked
+        ) {
+
+            let moved =
+                false;
+
+
+            if (
+                event.key ===
+                "ArrowLeft"
+            ) {
+
+                pushHistory();
+
+                item.x -=
+                    event.shiftKey
+                        ? 2
+                        : .5;
+
+                moved =
+                    true;
+
+            }
+
+
+            if (
+                event.key ===
+                "ArrowRight"
+            ) {
+
+                pushHistory();
+
+                item.x +=
+                    event.shiftKey
+                        ? 2
+                        : .5;
+
+                moved =
+                    true;
+
+            }
+
+
+            if (
+                event.key ===
+                "ArrowUp"
+            ) {
+
+                pushHistory();
+
+                item.y -=
+                    event.shiftKey
+                        ? 2
+                        : .5;
+
+                moved =
+                    true;
+
+            }
+
+
+            if (
+                event.key ===
+                "ArrowDown"
+            ) {
+
+                pushHistory();
+
+                item.y +=
+                    event.shiftKey
+                        ? 2
+                        : .5;
+
+                moved =
+                    true;
+
+            }
+
+
+            if (moved) {
+
+                event.preventDefault();
+
+                clampItem(
+                    item
+                );
+
+                renderStage();
+
+                scheduleAutosave();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   TOOLBAR EVENTS
+============================================================ */
+
+document
+    .getElementById(
+        "undoBtn"
+    )
+    .addEventListener(
+        "click",
+        undo
+    );
+
+
+document
+    .getElementById(
+        "redoBtn"
+    )
+    .addEventListener(
+        "click",
+        redo
+    );
+
+
+document
+    .getElementById(
+        "centerBtn"
+    )
+    .addEventListener(
+        "click",
+        centerSelected
+    );
+
+
+document
+    .getElementById(
+        "duplicateBtn"
+    )
+    .addEventListener(
+        "click",
+        duplicateSelected
+    );
+
+
+document
+    .getElementById(
+        "forwardBtn"
+    )
+    .addEventListener(
+        "click",
+        moveForward
+    );
+
+
+document
+    .getElementById(
+        "backBtn"
+    )
+    .addEventListener(
+        "click",
+        moveBackward
+    );
+
+
+document
+    .getElementById(
+        "rotateLeftBtn"
+    )
+    .addEventListener(
+        "click",
+        () =>
+            rotateSelected(-5)
+    );
+
+
+document
+    .getElementById(
+        "rotateRightBtn"
+    )
+    .addEventListener(
+        "click",
+        () =>
+            rotateSelected(5)
+    );
+
+
+document
+    .getElementById(
+        "flipHBtn"
+    )
+    .addEventListener(
+        "click",
+        flipHorizontal
+    );
+
+
+document
+    .getElementById(
+        "flipVBtn"
+    )
+    .addEventListener(
+        "click",
+        flipVertical
+    );
+
+
+document
+    .getElementById(
+        "lockBtn"
+    )
+    .addEventListener(
+        "click",
+        toggleLock
+    );
+
+
+document
+    .getElementById(
+        "hideBtn"
+    )
+    .addEventListener(
+        "click",
+        toggleHide
+    );
+
+
+document
+    .getElementById(
+        "deleteBtn"
+    )
+    .addEventListener(
+        "click",
+        deleteSelected
+    );
+
+
+/* ============================================================
+   TOP BUTTONS
+============================================================ */
+
+document
+    .getElementById(
+        "addItemBtn"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            currentImportCategory =
+                "accessories";
+
+            openModal(
+                "importModal"
+            );
+
+        }
+    );
+
+
+document
+    .getElementById(
+        "saveOutfitBtn"
+    )
+    .addEventListener(
+        "click",
+        saveCurrentOutfit
+    );
+
+
+document
+    .getElementById(
+        "loadOutfitBtn"
+    )
+    .addEventListener(
+        "click",
+        openSavedOutfits
+    );
+
+
+/* ============================================================
+   CLOSET EVENTS
+============================================================ */
+
+document
+    .getElementById(
+        "closetSearch"
+    )
+    .addEventListener(
+        "input",
+        renderCloset
+    );
+
+
+document
+    .getElementById(
+        "closetSort"
+    )
+    .addEventListener(
+        "change",
+        renderCloset
+    );
+
+
+document
+    .getElementById(
+        "favoriteFilterBtn"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            favoriteFilter =
+                !favoriteFilter;
+
+
+            this.classList.toggle(
+                "active",
+                favoriteFilter
+            );
+
+
+            renderCloset();
+
+        }
+    );
+
+
+/* ============================================================
+   MODAL CLOSE BUTTONS
+============================================================ */
+
+document
+    .querySelectorAll(
+        "[data-close]"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    closeModal(
+                        this.dataset.close
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+/*
+    Clicking outside a modal closes it.
+*/
+
+document
+    .querySelectorAll(
+        ".modal-overlay"
+    )
+    .forEach(
+        overlay => {
+
+            overlay.addEventListener(
+                "click",
+                function(event) {
+
+                    if (
+                        event.target ===
+                        overlay
+                    ) {
+
+                        overlay.classList.remove(
+                            "open"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+/* ============================================================
+   WINDOW BEFORE UNLOAD
+============================================================ */
+
+window.addEventListener(
+    "beforeunload",
+    function() {
+
+        /*
+            Save immediately instead of waiting
+            for the debounce timer.
+        */
+
+        clearTimeout(
+            autosaveTimer
+        );
+
+
+        performAutosave();
+
+    }
+);
+
+
+/* ============================================================
+   INITIALIZE
+============================================================ */
+
+async function initialize() {
+
+    try {
+
+        updateStorageStatus(
+            "Starting...",
+            "saving"
+        );
+
+
+        await initializeStorage();
+
+
+        /*
+            Load existing wardrobe assets.
+        */
+
+        try {
+
+            assets =
+                await getAllAssetsFromDB();
+
+        } catch (error) {
+
+            console.error(
+                "Could not load assets:",
+                error
+            );
+
+
+            /*
+                If IndexedDB suddenly becomes
+                unavailable, try localStorage.
+            */
+
+            if (
+                storageMode ===
+                "indexedDB"
+            ) {
+
+                const fallback =
+                    getFallbackAssets();
+
+
+                if (
+                    fallback.length > 0
+                ) {
+
+                    assets =
+                        fallback;
+
+                    storageMode =
+                        "localStorage";
+
+                } else {
+
+                    assets =
+                        [];
+
+                }
+
+            } else {
+
+                assets =
+                    [];
+
+            }
+
+        }
+
+
+        renderCategories();
+
+        renderStage();
+
+
+        /*
+            Restore previous session.
+        */
+
+        setTimeout(
+            restoreAutosaveIfAvailable,
+            300
+        );
+
+
+        updateStageZoom(
+            100
+        );
+
+
+        if (
+            storageMode ===
+            "indexedDB"
+        ) {
+
+            updateStorageStatus(
+                "Storage: IndexedDB",
+                "saved"
+            );
+
+        } else if (
+            storageMode ===
+            "localStorage"
+        ) {
+
+            updateStorageStatus(
+                "Storage: local",
+                "saved"
+            );
+
+        } else {
+
+            updateStorageStatus(
+                "Storage: temporary",
+                "error"
+            );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Initialization error:",
+            error
+        );
+
+
+        /*
+            Important:
+            The application should still open even
+            if browser storage fails.
+        */
+
+        assets =
+            [];
+
+        gameItems =
+            [];
+
+        renderCategories();
+
+        renderStage();
+
+
+        updateStorageStatus(
+            "Storage unavailable",
+            "error"
+        );
+
+
+        showToast(
+            "The app opened, but browser storage is unavailable. Try localhost or your website for persistent storage.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/*
+    Start the application.
+*/
+
+initialize();
+
+// Deselect object when clicking outside the stage
+document.addEventListener("click", function(e) {
+    const stage = document.querySelector(".stage");
+
+    if (stage && !stage.contains(e.target)) {
+        selectedItemId = null;
+        renderStage();
+    }
+});
+
+</script>
+
+</body>
+</html>
